@@ -39,10 +39,12 @@ for tt = 1:length(fileB)
         end
     end
 
-    %% Start loop for all subcarriers
+    % Init figure
     figure;
     name_str = strrep(fileB{tt},'.csv',''); % Figure Title
     labelArr = strings(32,1); % Init Subplot Titles
+
+    %% Start loop for all subcarriers
     for sub = 1:32
         %% Unwrapped Phase
         Bpha_uw = unwrap(angle(Bcsi(:,sub)));
@@ -50,12 +52,11 @@ for tt = 1:length(fileB)
         %% Compute EMD and obtain IMF
         [imf, residual, info] = emd(Bpha_uw);
 
-        %% Calculate Mutual Information MI(k) [eq. 8]
+        %% Calculate Mutual Information MI(k) via Fast MI function
         MI = zeros(size(imf,2)-1,1);
         Xr = zeros(size(imf,1),1); % deterministic component (respiratory)
         Xn = zeros(size(imf,1),1); % stochastic component (noise)
 
-        % Via Fast MI function
         for idx = 1:size(MI,1)
             K_temp = idx + 1;
             Xr = sum(imf(:, (K_temp:size(imf,2))), 2)+residual; % add imfs k through m
@@ -84,9 +85,9 @@ for tt = 1:length(fileB)
         Pmat(sub, tt) = periodicity;
         Smat(sub, tt) = sensitivity;
 
-        %% Plot the Reconstructed 
+        %% Plot the Reconstructed Signal against Original Signal
         subplot(8,4,sub);
-        labelArr(sub) = "ch"+(sub-1)+"  p="+periodicity+"  s="+sensitivity;
+        labelArr(sub) = "ch"+(sub-1)+"  p="+periodicity+"  s="+sensitivity+"  k="+K_optim;
         plot(Bt, Bpha_uw, 'c'); 
         hold on;
         plot(Bt, signal, 'r'); 
@@ -101,8 +102,8 @@ for tt = 1:length(fileB)
     fig = get(groot,'CurrentFigure');
     fig.PaperPositionMode = 'auto';
     fig.Color = [245, 245, 245]/255;
-%     fig.Position = get(0, 'Screensize');
-%     saveas(fig, ['images/' name_str, '.png'],'png');
+    % fig.Position = get(0, 'Screensize');
+    % saveas(fig, ['images/' name_str, '.png'],'png');
 
 end
 

@@ -37,95 +37,53 @@ for ii = 1:32
     end
 end
 
-%% Start loop for all subcarriers
+%% Specify Subcarrier
+sub = 8; 
+
 %% Unwrapped Phase
-sub = 8; % subcarrier
 Bpha_uw = unwrap(angle(Bcsi(:,sub)));
-figure;
-labelArr(sub) = "ch"+(sub-1);
-plot(Bt, Bpha_uw, 'k','LineWidth',1);
-grid on
-set(gca,'FontSize',12,'Color',[245, 245, 245]/255);
-set(gca, 'Xtick', 0:5:60)
 
 %% Compute EMD and obtain IMF
 [imf, residual, info] = emd(Bpha_uw);
-% emd(Bpha_uw)
 
-%% Calculate the power of each IMF [eq. 10] **optional**
-% power = (1/size(imf, 1)) .* sum(imf.^2, 1);
-
-%% Identify the "coarse" reconstruction index K' [eq. 11] **optional**
-% [~, k_prime] = max(power);
-
-%% Calculate Mutual Information MI(k) [eq. 8]
+%% Calculate Mutual Information MI(k) via Fast MI
 MI = zeros(size(imf,2)-1,1);
 Xr = zeros(size(imf,1),1); % deterministic component (respiratory)
 Xn = zeros(size(imf,1),1); % stochastic component (noise)
 
-% Via Fast MI function
 for idx = 1:size(MI,1)
     K_temp = idx + 1;
-    figure;
-    plot(Bt, Bpha_uw, 'g');
-    grid on;
     Xr = sum(imf(:, (K_temp:size(imf,2))), 2)+residual; % add imfs k through m
     Xn = sum(imf(:, (1:K_temp-1)), 2)+residual; % add imfs 1 through k-1
-    hold on;
-    plot(Bt,Xr, 'r'); 
     MI(idx) = mi(Xr,Xn); % Fast MI
 end
-
-
-% Via Naive Equidistant Binning Estimator (ED)
-% for idx = 1:size(MI,1)-1
-%     K_temp = idx + 1;
-%     Xr = sum(imf(:, (K_temp:size(imf,2))), 2); % add imfs k through m
-%     Xn = sum(imf(:, (1:K_temp-1)), 2); % add imfs 1 through k-1
-%     
-%     XrXn_jp = 0; % joint probability
-%     Xr_mp = 0; % marginal probability of respiratory 
-%     Xn_mp = 0; % marginal probability of noise
-%     
-%     MI(idx) = sum(XrXn_jp*log(XrXn_jp/(Xr_mp*Xn_mp)), 'all');
-%     
-% end
-
-% Via Adaptive Partioning (AD)? will look into later
 
 %% Calculate Mutual Information Ratio MIR(k) [eq. 9]
 MIR = zeros(size(MI,1)-1,1);
 for idx = 1:size(MI,1)-1
-%     K_temp = idx + 1;
     MIR(idx) = MI(idx+1) / MI(idx);
 end
 
 %% Find optimal K value (w/ highest MIR)
-[~, K_optim] = max(MIR);
-K_optim = K_optim+1;
+[~, mir_argmax] = max(MIR);
+K_optim = mir_argmax+1;
 
 %% Reconstruct the filtered signal [eq. 6]
 signal = sum(imf(:, (K_optim:size(imf,2))), 2)+residual;
 
-%% Plot the Reconstructed Signal
-figure;
-plot(Bt, signal);
-grid on
-set(gca, 'Xtick', 0:5:60)
-
-%% Compute Periodicity (verify formula is correct)
+%% Compute Periodicity and Sensitivity [from Liu 2020] 
 periodicity = max(pwelch(signal)) / mean(pwelch(signal));
-
-%% Compute Sensitivity (verify formula is correct)
 sensitivity = sum((signal - mean(signal)).^2 / length(signal));
 
-%% End loop for all subcarriers
-%% Output P and S for each subcarrier
-
-
-
-
-
-
-
-
+%% Plot the Reconstructed Signal
+figure;
+labelArr(sub) = "ch"+(sub-1)+"  p="+periodicity+"  s="+sensitivity+"  k="+K_optim;
+plot(Bt, Bpha_uw, 'c'); 
+hold on;
+plot(Bt, signal, 'r'); 
+title(labelArr{sub});
+grid on;
+set(gca,'FontSize',12,'Color',[245, 245, 245]/255);
+set(gca, 'Xtick', 0:5:60);
+xlim([1 60])
+hold off;

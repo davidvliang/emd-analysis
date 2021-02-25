@@ -41,10 +41,12 @@ end
 Pmat = zeros(size(Bcsi,2),1);
 Smat = zeros(size(Bcsi,2),1); 
 
-%% Start loop for all subcarriers
+%% Init figure
 figure;
 name_str = strrep(fileB,'.csv',''); % Figure Title
 labelArr = strings(32,1); % Init Subplot Titles
+
+%% Start loop for all subcarriers
 for sub = 1:32
     %% Unwrapped Phase
     Bpha_uw = unwrap(angle(Bcsi(:,sub)));
@@ -88,14 +90,15 @@ for sub = 1:32
     
     %% Plot the Reconstructed 
     subplot(8,4,sub);
-    labelArr(sub) = "ch"+(sub-1)+" p="+periodicity+" s="+sensitivity;
-    plot(Bt, Bpha_uw, 'g'); 
+    labelArr(sub) = "ch"+(sub-1)+"  p="+periodicity+"  s="+sensitivity+"  k="+K_optim;
+    plot(Bt, Bpha_uw, 'c'); 
     hold on;
     plot(Bt, signal, 'r'); 
     title(labelArr{sub});
     grid on;
     set(gca,'FontSize',12,'Color',[245, 245, 245]/255);
     set(gca, 'Xtick', 0:5:60);
+    xlim([1 60])
     hold off;
     
 end % End loop for all subcarriers
