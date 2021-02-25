@@ -37,17 +37,17 @@ for ii = 1:32
     end
 end
 
+%% Initialize Periodicity and Sensitivity Collections
+Pmat = zeros(size(Bcsi,2),1);
+Smat = zeros(size(Bcsi,2),1); 
+
 %% Start loop for all subcarriers
+figure;
+name_str = strrep(fileB,'.csv',''); % Figure Title
+labelArr = strings(32,1); % Init Subplot Titles
 for sub = 1:32
     %% Unwrapped Phase
-    sub = 8; % subcarrier
     Bpha_uw = unwrap(angle(Bcsi(:,sub)));
-    figure;
-    labelArr(sub) = "ch"+(sub-1);
-    plot(Bt, Bpha_uw, 'k','LineWidth',1);
-    grid on
-    set(gca,'FontSize',12,'Color',[245, 245, 245]/255);
-    set(gca, 'Xtick', 0:5:60)
 
     %% Compute EMD and obtain IMF
     [imf, residual, info] = emd(Bpha_uw);
@@ -60,13 +60,8 @@ for sub = 1:32
     % Via Fast MI function
     for idx = 1:size(MI,1)
         K_temp = idx + 1;
-        figure;
-        plot(Bt, Bpha_uw, 'g');
-        grid on;
         Xr = sum(imf(:, (K_temp:size(imf,2))), 2)+residual; % add imfs k through m
         Xn = sum(imf(:, (1:K_temp-1)), 2)+residual; % add imfs 1 through k-1
-        hold on;
-        plot(Bt,Xr, 'r'); 
         MI(idx) = mi(Xr,Xn); % Fast MI
     end
 
@@ -82,22 +77,32 @@ for sub = 1:32
 
     %% Reconstruct the filtered signal [eq. 6]
     signal = sum(imf(:, (K_optim:size(imf,2))), 2)+residual;
-
-    %% Plot the Reconstructed Signal
-    figure;
-    plot(Bt, signal);
-    grid on;
-    set(gca, 'Xtick', 0:5:60);
-
-    %% Compute Periodicity (verify formula is correct)
+    
+    %% Compute Periodicity and Sensitivity (verify formulas are correct)
     periodicity = max(pwelch(signal)) / mean(pwelch(signal));
-
-    %% Compute Sensitivity (verify formula is correct)
     sensitivity = sum((signal - mean(signal)).^2 / length(signal));
     
+    %% Store P & S in Collection
+    Pmat(sub) = periodicity;
+    Smat(sub) = sensitivity;
+    
+    %% Plot the Reconstructed 
+    subplot(8,4,sub);
+    labelArr(sub) = "ch"+(sub-1)+" p="+periodicity+" s="+sensitivity;
+    plot(Bt, Bpha_uw, 'g'); 
+    hold on;
+    plot(Bt, signal, 'r'); 
+    title(labelArr{sub});
+    grid on;
+    set(gca,'FontSize',12,'Color',[245, 245, 245]/255);
+    set(gca, 'Xtick', 0:5:60);
+    hold off;
+    
 end % End loop for all subcarriers
-
-%% Output P and S for each subcarrier
+sgtitle(['EMD Filtering for Trial: ', name_str], 'Interpreter', 'None');
+fig = get(groot,'CurrentFigure');
+fig.PaperPositionMode = 'auto';
+fig.Color = [245, 245, 245]/255;
 
 
 
