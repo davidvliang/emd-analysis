@@ -16,7 +16,7 @@ function I=mi(A,B,varargin)
 if nargin>=3
     L=varargin{1};
 else
-    L=256;
+    L=1024;
 end
 
 A=double(A); 
