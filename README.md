@@ -38,5 +38,7 @@ EMD Filtering for all 8 trials. Outputs 8 figures for 8 trials. Runs slowly.
 ## References
 
 [1] [Continuous User Verification via Respiratory Biometrics](https://ieeexplore.ieee.org/document/9155258)
+
 [2] [Tissue Artifact removal from Respiratory Signals Based on Empirical Mode Decomposition](https://www.researchgate.net/publication/234157872_Tissue_Artifact_Removal_from_Respiratory_Signals_Based_on_Empirical_Mode_Decomposition) 
+
 [3] [Evaluation of Mutual Information Estimators for Time Series](https://www.researchgate.net/publication/45849000_Evaluation_of_Mutual_Information_Estimators_for_Time_Series)
