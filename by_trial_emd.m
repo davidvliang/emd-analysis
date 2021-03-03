@@ -5,7 +5,7 @@ close all
 
 %% Import data
 
-fileB = '1.1m_2.78m_2mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_05.csv';
+% fileB = '1.1m_2.78m_2mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_05.csv';
 % fileB = '1.1m_2.78m_2mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_06.csv';
 
 % fileB = '1.1m_2.78m_4mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_10.csv';
@@ -16,6 +16,8 @@ fileB = '1.1m_2.78m_2mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_05.csv';
 
 % fileB = '1.1m_2.733m_4mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_30.csv';
 % fileB = '1.1m_2.733m_4mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_31.csv';
+
+fileB = 'MufRef_0.30Hz_Far.csv';
 
 B = readtable(fileB);
 
@@ -90,7 +92,7 @@ for sub = 1:32
     
     %% Plot the Reconstructed 
     subplot(8,4,sub);
-    labelArr(sub) = "ch"+(sub-1)+"  p="+periodicity+"  s="+sensitivity+"  k="+K_optim;
+    labelArr(sub) = "ch"+(sub-1)+"  p="+periodicity+"  s="+sensitivity+"  k="+K_optim+"/"+size(imf,2);
     plot(Bt, Bpha_uw, 'c'); 
     hold on;
     plot(Bt, signal, 'r'); 

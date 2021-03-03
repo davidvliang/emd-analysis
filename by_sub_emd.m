@@ -5,7 +5,9 @@ close all
 
 %% Import data
 
-fileB = '1.1m_2.78m_2mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_05.csv';
+fileB = 'MufRef_0.30Hz_Far.csv';
+
+% fileB = '1.1m_2.78m_2mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_05.csv';
 % fileB = '1.1m_2.78m_2mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_06.csv';
 
 % fileB = '1.1m_2.78m_4mm_28-GHz_1M-IQ/BER_CSI_B_21_02_05_02_10.csv';
@@ -38,13 +40,14 @@ for ii = 1:32
 end
 
 %% Specify Subcarrier
-sub = 8; 
+sub = 14; 
 
 %% Unwrapped Phase
 Bpha_uw = unwrap(angle(Bcsi(:,sub)));
 
 %% Compute EMD and obtain IMF
 [imf, residual, info] = emd(Bpha_uw);
+emd(Bpha_uw);
 
 %% Calculate Mutual Information MI(k) via Fast MI
 MI = zeros(size(imf,2)-1,1);
@@ -77,13 +80,13 @@ sensitivity = sum((signal - mean(signal)).^2 / length(signal));
 
 %% Plot the Reconstructed Signal
 figure;
-labelArr(sub) = "ch"+(sub-1)+"  p="+periodicity+"  s="+sensitivity+"  k="+K_optim;
+labelArr(sub) = "ch"+(sub-1)+"  p="+periodicity+"  s="+sensitivity+"  k="+K_optim+"/"+size(imf,2);
 plot(Bt, Bpha_uw, 'c'); 
 hold on;
 plot(Bt, signal, 'r'); 
 title(labelArr{sub});
 grid on;
 set(gca,'FontSize',12,'Color',[245, 245, 245]/255);
-set(gca, 'Xtick', 0:5:60);
-xlim([1 60])
+set(gca, 'Xtick', 0:5:120);
+xlim([1 size(Bt, 1)/10])
 hold off;
