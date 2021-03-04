@@ -66,7 +66,8 @@ for sub = 1:32
         K_temp = idx + 1;
         Xr = sum(imf(:, (K_temp:size(imf,2))), 2)+residual; % add imfs k through m
         Xn = sum(imf(:, (1:K_temp-1)), 2)+residual; % add imfs 1 through k-1
-        MI(idx) = mi_cont_cont(Xr, Xn, 3); % knn method
+        neighbors = 2;
+        MI(idx) = mi_cont_cont(Xr, Xn, neighbors); % knn method
 %         MI(idx) = mi(Xr,Xn); % Fast MI
     end
 
@@ -105,11 +106,12 @@ for sub = 1:32
     hold off;
     
 end % End loop for all subcarriers
-sgtitle(['EMD Filtering for Trial: ', name_str], 'Interpreter', 'None');
+sgtitle("EMD for Trial: "+name_str+"  [neighbors="+neighbors+"]", 'Interpreter', 'None');
 fig = get(groot,'CurrentFigure');
 fig.PaperPositionMode = 'auto';
 fig.Color = [245, 245, 245]/255;
-
+fig.Position = get(0, 'Screensize');
+saveas(fig, ['images/' name_str, '.png'],'png');
 
 
 
