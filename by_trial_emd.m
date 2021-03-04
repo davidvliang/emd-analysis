@@ -66,7 +66,8 @@ for sub = 1:32
         K_temp = idx + 1;
         Xr = sum(imf(:, (K_temp:size(imf,2))), 2)+residual; % add imfs k through m
         Xn = sum(imf(:, (1:K_temp-1)), 2)+residual; % add imfs 1 through k-1
-        MI(idx) = mi(Xr,Xn); % Fast MI
+        MI(idx) = mi_cont_cont(Xr, Xn, 3); % knn method
+%         MI(idx) = mi(Xr,Xn); % Fast MI
     end
 
     %% Calculate Mutual Information Ratio MIR(k) [eq. 9]

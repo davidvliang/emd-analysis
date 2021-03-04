@@ -40,7 +40,7 @@ for ii = 1:32
 end
 
 %% Specify Subcarrier
-sub = 14; 
+sub = 15; 
 
 %% Unwrapped Phase
 Bpha_uw = unwrap(angle(Bcsi(:,sub)));
@@ -58,7 +58,8 @@ for idx = 1:size(MI,1)
     K_temp = idx + 1;
     Xr = sum(imf(:, (K_temp:size(imf,2))), 2)+residual; % add imfs k through m
     Xn = sum(imf(:, (1:K_temp-1)), 2)+residual; % add imfs 1 through k-1
-    MI(idx) = mi(Xr,Xn); % Fast MI
+%     MI(idx) = mi(Xr,Xn); % Fast MI
+    MI(idx) = mi_cont_cont(Xn, Xr, 2); % knn method
 end
 
 %% Calculate Mutual Information Ratio MIR(k) [eq. 9]
